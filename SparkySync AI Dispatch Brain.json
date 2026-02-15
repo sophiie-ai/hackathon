@@ -1,0 +1,1341 @@
+{
+  "name": "SparkySync AI Dispatch Brain",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1408,
+        -288
+      ],
+      "id": "e7746632-95a0-49ae-9241-649be79e071a",
+      "name": "Webhook",
+      "webhookId": "ff89f5c9-90e1-46af-8ecb-253c630a8a7d"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c34ee86c-c6fb-4f78-8b5a-47141e0116d8",
+              "leftValue": "={{ $json.body.NumMedia > 0 }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1200,
+        -288
+      ],
+      "id": "a355ecf2-43ee-4d46-8202-4340d55dca4a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "=={{ $json.body.MediaUrl0 }}\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -992,
+        -384
+      ],
+      "id": "d87595d1-3f15-4e87-b16a-a3c96509c607",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5XlYcvqyyJnGrMAC",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -784,
+        -384
+      ],
+      "id": "850df5d4-0566-4d9f-a6f7-b8a1c1cd141d",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "FkzEy1Ii4OLzmd6N",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1ddac130-d020-406b-9c2e-83de6b161d21",
+              "name": "chat_input",
+              "value": "=={{ $json.results?.channels[0]?.alternatives[0]?.transcript || $('Webhook').item.json.body.Body }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -592,
+        -224
+      ],
+      "id": "41530fc8-2ed1-48c8-8dbf-d1f0f63531ef",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=={{ $json.chat_input }}\n",
+        "options": {
+          "systemMessage": "You are Sophie, an AI Dispatch Manager for a home services company.\n\nYou talk to customers and tradies via WhatsApp.\n\nSTEP 1:\nDetermine if user is:\n- CUSTOMER requesting service\n- TRADIE requesting jobs\n- TRADIE updating job\n\nIf unclear, ask.\n\n---------------------\nCUSTOMER FLOW:\n\nCollect:\n- Full Name\n- Phone\n- Service Type\n- Problem\n- Address\n- Postcode\n- Preferred Date\n- Preferred Time\n- Emergency? (Yes/No)\n\nMark priority HIGH if:\n- Gas leak\n- Electrical hazard\n- Flooding\n- No power\n- Safety risk\n\nWhen all confirmed output ONLY:\n\n{\n  \"type\": \"new_job\",\n  \"priority\": \"high/normal\",\n  \"customer_name\": \"\",\n  \"phone\": \"\",\n  \"service_type\": \"\",\n  \"description\": \"\",\n  \"address\": \"\",\n  \"postcode\": \"\",\n  \"preferred_date\": \"\",\n  \"preferred_time\": \"\",\n  \"emergency\": true/false\n}\n\n---------------------\nTRADIE REQUEST JOBS:\n\n{\n  \"type\": \"tradie_request_jobs\",\n  \"tradie_phone\": \"\"\n}\n\n---------------------\nTRADIE UPDATE:\n\n{\n  \"type\": \"job_update\",\n  \"action\": \"accept/complete\",\n  \"job_id\": \"\"\n}\n\nNever include text outside JSON when structured output is required.\nKeep WhatsApp replies short and natural.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -368,
+        -336
+      ],
+      "id": "b561fcb1-e023-43d0-9d69-4bab5963f0c8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.From }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        -96
+      ],
+      "id": "12aa60ce-6fc1-4fd3-84da-daa3c2f317e0",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -432,
+        -64
+      ],
+      "id": "3e2f45dc-ba4c-43b6-8630-1b4a0b8faac8",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "zTp62mJnGfYYNYrT",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f8bb6eb7-935e-4b08-8caa-d91d0ffe22d5",
+              "name": "parsed",
+              "value": "=={{ JSON.parse($json.output) }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        -336
+      ],
+      "id": "2bef6053-0de9-40fb-9e57-ded177e680bc",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "=={{ $json.parsed.type }}",
+                    "rightValue": "new_job",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9eebe9d9-a9d3-44bc-b4e1-9f2ed0138554"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "21b202dd-853b-46b4-a1d2-ae23bd65cede",
+                    "leftValue": "=={{ $json.parsed.type }}",
+                    "rightValue": "tradie_request_jobs",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "acd154cb-974d-4f8b-bf6f-5e32124d961c",
+                    "leftValue": "=={{ $json.parsed.type }}",
+                    "rightValue": "job_update",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        -336
+      ],
+      "id": "224fdcb3-e7f8-402c-bbde-c1eb66f3b8a7",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5ded2ea8-d53b-41a1-91f7-66d2d1a19d0d",
+              "name": "job_id",
+              "value": "={{ Date.now() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        -432
+      ],
+      "id": "6cf5211a-e264-41c4-9a69-c504df09b87d",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1c1NFHoDvqaTpAwHhtJjVlmvst2BI-Zjg8s3NQGTR_DU",
+          "mode": "list",
+          "cachedResultName": "Configure Google Sheets Node in n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c1NFHoDvqaTpAwHhtJjVlmvst2BI-Zjg8s3NQGTR_DU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1977290074,
+          "mode": "list",
+          "cachedResultName": "Configure Google Sheets Node in n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c1NFHoDvqaTpAwHhtJjVlmvst2BI-Zjg8s3NQGTR_DU/edit#gid=1977290074"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "job_id": "={{$json.job_id}}",
+            "status": "pending",
+            "priority": "={{$json.parsed.priority}}",
+            "customer_name": "={{$json.parsed.customer_name}}",
+            "phone": "={{$json.parsed.phone}}",
+            "service_type": "={{$json.parsed.service_type}}",
+            "description": "={{$json.parsed.description}}",
+            "address": "={{$json.parsed.address}}",
+            "postcode": "={{$json.parsed.postcode}}",
+            "preferred_date": "={{$json.parsed.preferred_date}}",
+            "preferred_time": "={{$json.parsed.preferred_time}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "service_type",
+              "displayName": "service_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postcode",
+              "displayName": "postcode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "preferred_date",
+              "displayName": "preferred_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "preferred_time",
+              "displayName": "preferred_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "assigned_tradie",
+              "displayName": "assigned_tradie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        656,
+        -432
+      ],
+      "id": "853da82c-36f0-43bf-a082-e58fc2ae3006",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "a3ayfIFLKycom3ke",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7b3a066f-1277-4d5a-81b5-7e15c6b35e60",
+              "leftValue": "=={{ $json.parsed.priority === \"high\" }}",
+              "rightValue": "High",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        864,
+        -432
+      ],
+      "id": "9ce8c29e-3e10-493a-ad3e-1a8aa4977f0d",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ItvD6_1lGRXQnL4kfJaVDpA5HFg_5nVq_c9cFR6gqNg",
+          "mode": "list",
+          "cachedResultName": "Tradies",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ItvD6_1lGRXQnL4kfJaVDpA5HFg_5nVq_c9cFR6gqNg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ItvD6_1lGRXQnL4kfJaVDpA5HFg_5nVq_c9cFR6gqNg/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "available",
+              "lookupValue": "yes"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1072,
+        -528
+      ],
+      "id": "8f8cab72-3947-494b-8d5c-4098e8667f81",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "a3ayfIFLKycom3ke",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "whatsapp: +14155238886",
+        "to": "=+{{ $json.phone }}",
+        "message": "=🚨 EMERGENCY JOB Service: {{$json.parsed.service_type}} Location: {{$json.parsed.postcode}} Job ID: {{$json.job_id}}  Reply ACCEPT {{$json.job_id}} to take this job.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        -528
+      ],
+      "id": "3eea06dc-bc7b-4062-898e-12bcd99ced29",
+      "name": "Send an SMS/MMS/WhatsApp message",
+      "credentials": {
+        "twilioApi": {
+          "id": "exH4rZH1LuQ3UPKm",
+          "name": "Twilio account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7776c7a6-527c-406a-8159-8631dee315c5",
+              "leftValue": "skills",
+              "rightValue": "={{$json.parsed.service_type}}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "e5ade8d1-8e65-4a03-aec2-1c68e091d9d6",
+              "leftValue": "Available",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "1f99146d-8a0d-431e-b18f-cc60ac14eba3",
+              "leftValue": "postcode",
+              "rightValue": "={{$json.parsed.postcode}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1488,
+        -528
+      ],
+      "id": "62bcca3c-c240-4c2e-b2cb-262ec6894795",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1c1NFHoDvqaTpAwHhtJjVlmvst2BI-Zjg8s3NQGTR_DU",
+          "mode": "list",
+          "cachedResultName": "Configure Google Sheets Node in n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c1NFHoDvqaTpAwHhtJjVlmvst2BI-Zjg8s3NQGTR_DU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1977290074,
+          "mode": "list",
+          "cachedResultName": "Configure Google Sheets Node in n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c1NFHoDvqaTpAwHhtJjVlmvst2BI-Zjg8s3NQGTR_DU/edit#gid=1977290074"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "job_id": "={{ $('Edit Fields2').first().json.job_id }}",
+            "status": "assigned"
+          },
+          "matchingColumns": [
+            "job_id"
+          ],
+          "schema": [
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "service_type",
+              "displayName": "service_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postcode",
+              "displayName": "postcode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "preferred_date",
+              "displayName": "preferred_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "preferred_time",
+              "displayName": "preferred_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "assigned_tradie",
+              "displayName": "assigned_tradie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1696,
+        -528
+      ],
+      "id": "28b45d3f-3654-4b64-83e5-4b482fe686ae",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "a3ayfIFLKycom3ke",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "whatsapp: +14155238886",
+        "to": "=+{{ $json.phone }}",
+        "message": "=New Job Assigned 🛠  Service: {{$json.parsed.service_type}} Address: {{$json.parsed.address}} Date: {{$json.parsed.preferred_date}} Time: {{$json.parsed.preferred_time}}  Reply ACCEPT {{$json.job_id}} to confirm.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1904,
+        -528
+      ],
+      "id": "5fdc32c2-0901-4657-9c9f-c83e28db5240",
+      "name": "Send an SMS/MMS/WhatsApp message1",
+      "credentials": {
+        "twilioApi": {
+          "id": "exH4rZH1LuQ3UPKm",
+          "name": "Twilio account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "89eefb83-ef4d-4609-b8dc-7572a0a3e572",
+              "leftValue": "assigned_tradie",
+              "rightValue": "={{$json.parsed.tradie_phone}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "4d3f69bd-ca9a-4281-af71-1cd590769da2",
+              "leftValue": "status",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        560,
+        -240
+      ],
+      "id": "785ebcab-13fb-4115-8c53-687f8150b6f3",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Start the message header\nlet message = \"Your Jobs Today:\\n\\n\";\n\n// 2. Loop through every job found in the previous step\nfor (let i = 0; i < items.length; i++) {\n  const job = items[i].json; // Get the data for this row\n\n  // 3. Add the job details to the message string\n  message += `${i + 1}️⃣ ID: ${job.job_id}\\n`;\n  message += `${job.service_type} - ${job.postcode}\\n`;\n  message += `${job.preferred_time}\\n\\n`; // Add extra spacing\n}\n\n// 4. Output the final single message\nreturn [{json: { summary_text: message }}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        -272
+      ],
+      "id": "9768c47e-7bdf-48ba-9013-d68a36eeb11f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "from": "whatsapp: +14155238886",
+        "to": "=+{{ $json.phone }}",
+        "message": "={{ $json.summary_text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        -272
+      ],
+      "id": "1cb76991-821e-419e-a2fe-61ed7bee27f0",
+      "name": "Send an SMS/MMS/WhatsApp message2",
+      "credentials": {
+        "twilioApi": {
+          "id": "exH4rZH1LuQ3UPKm",
+          "name": "Twilio account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1c1NFHoDvqaTpAwHhtJjVlmvst2BI-Zjg8s3NQGTR_DU",
+          "mode": "list",
+          "cachedResultName": "Configure Google Sheets Node in n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c1NFHoDvqaTpAwHhtJjVlmvst2BI-Zjg8s3NQGTR_DU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1977290074,
+          "mode": "list",
+          "cachedResultName": "Configure Google Sheets Node in n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c1NFHoDvqaTpAwHhtJjVlmvst2BI-Zjg8s3NQGTR_DU/edit#gid=1977290074"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "={{ $json.action == 'accept' ? 'accepted' : ($json.action == 'complete' ? 'completed' : $json.status) }}",
+            "job_id": "={{ $json.job_id }}"
+          },
+          "matchingColumns": [
+            "job_id"
+          ],
+          "schema": [
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "service_type",
+              "displayName": "service_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postcode",
+              "displayName": "postcode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "preferred_date",
+              "displayName": "preferred_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "preferred_time",
+              "displayName": "preferred_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "assigned_tradie",
+              "displayName": "assigned_tradie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        368,
+        -80
+      ],
+      "id": "a424253b-b7f6-4173-9d43-c5c13080cda7",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "a3ayfIFLKycom3ke",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "whatsapp: +14155238886",
+        "to": "=+{{ $json.phone }}",
+        "message": "={{ $json.action == 'accept' ?\n\"Good news 🎉\\nYour tradie is on the way!\" :\n\"Your job has been completed ✅\\nThank you for using SparkySync!\"\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        576,
+        -80
+      ],
+      "id": "5ecf2063-b6a5-44b8-8eda-288b720b9d90",
+      "name": "Send an SMS/MMS/WhatsApp message3",
+      "credentials": {
+        "twilioApi": {
+          "id": "exH4rZH1LuQ3UPKm",
+          "name": "Twilio account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "fda9a480-9a06-4d7b-a961-3e7d1587f440",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "071711949009aaf95f828031643255422b4bc04a266f87fb31e2e06d7c455ad3"
+  },
+  "id": "qtwjd24NaIqLnnxR",
+  "tags": []
+}
