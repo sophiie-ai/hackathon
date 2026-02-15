@@ -162,24 +162,158 @@ Sophiie senior engineers and CTO. Judging will take place over a 2-week period f
 
 | Field | Your Answer |
 |-------|-------------|
-| **Name** | |
-| **University / Employer** | |
+| **Name** | Phanikiran Pisipati|
+| **University / Employer** |NSW Department of Customer Service |
 
 ### Project
 
 | Field | Your Answer |
 |-------|-------------|
-| **Project Name** | |
-| **One-Line Description** | |
+| **Project Name** | DocuBot: AI Powered UiPath Documentation Assistant |
+| **One-Line Description** | The proposed UiPath chatbot will be an AI-powered system that will be trained on a 
+massive dataset of UiPath documentation and forum posts. It will be able to: 
+• Answer questions about UiPath: The chatbot will be able to answer a wide 
+range of questions about UiPath, including questions about the platform, the 
+various components of the platform, and how to use the platform to automate 
+various tasks. 
+• Generate code snippets: The chatbot will be able to generate code snippets in 
+UiPath's programming language, UiPath Robot Language (UIR). This will 
+make it easier for users to automate tasks without having to write code from 
+scratch. 
+• Provide step-by-step instructions: The chatbot will be able to provide step-by- 
+step instructions on how to automate various tasks using UiPath. This will 
+make it easier for users to learn how to use UiPath, even if they have no prior 
+experience with automation. 
+The chatbot will be integrated with the UiPath platform so that users can easily 
+access it from within the UiPath environment. It will also be available as a standalone 
+application, so that users can access it from anywhere. 
+Here is a detailed description of how the chatbot will work: 
+1. The user will ask a question or give a command to the chatbot. 
+2. The chatbot will use Retravel Augmentation Generation (RAG) from Pinecone 
+vector DB to retrieve top K chunks based on cosine similarity measure 
+between the embeddings present in the DB and the user requested question. 
+3. Vector DB search result, the context and prompt engineering will be used by 
+the LLM to generate a response to the user's request. The response may be a 
+simple answer, a code snippet, or step-by-step instructions. 
+The chatbot will be trained using a variety technique, including: 
+• Reinforcement learning with human feedback (RLHF): The chatbot will be 
+trained on a simulated environment where it can interact with UiPath and 
+receive feedback on its performance. This feedback will help the chatbot to 
+learn how to generate better responses to user requests. 
+The chatbot will be deployed on a cloud platform so that it can be accessed by users 
+from anywhere. The chatbot will also be designed to be scalable so that it can 
+handle a large number of concurrent users. 
+We believe that the proposed UiPath chatbot has the potential to be a valuable tool 
+for UiPath users of all levels of experience. It will help users to automate their tasks 
+more quickly and efficiently, and it will make UiPath more accessible to a wider 
+range of users.|
 | **Demo Video Link** | |
-| **Tech Stack** | |
-| **AI Provider(s) Used** | |
+| **Tech Stack** | UiPath Forms.GPT-4: Large Language Model (LLM) •  RAG: To answer questions about the documentation using the vector DB 
+• Langchain: A framework to interact with LLM 
+• Pinecone vector DB: To store and retrieve the numerical vector embeddings.
+
+ |
+| **AI Provider(s) Used** |GPT-4: Large Language Model (LLM) •  RAG: To answer questions about the documentation using the vector DB 
+• Langchain: A framework to interact with LLM  |
 
 ### About Your Project
-
+1. Problem Statement 
+UiPath documentation is vast and complex, making it difficult for users to find the 
+information they need. This can lead to decreased productivity, increased errors, and 
+frustration for users. 
+Opportunity 
+An AI-powered UiPath Documentation Assistant can help to solve this problem by 
+providing users with a single, easy-to-use interface for accessing all of the UiPath 
+documentation. This Assistant uses Generative AI to understand the user's query and 
+provide them with the most relevant information. 
+Proposed Solution 
+We propose to develop an AI-powered UiPath Documentation Assistant using the 
+following technologies: 
+• Gen API: To generate documentation from scratch or update existing 
+documentation. 
+• GPT-4: Large Language Model (LLM) 
+• RAG: To answer questions about the documentation using the vector DB 
+• Langchain: A framework to interact with LLM 
+• Pinecode vector DB: To store and retrieve the numerical vector embeddings. 
+Our solution will be integrated with the UiPath platform, so that users can easily access 
+it from within the UiPath environment. 
+Benefits 
+An AI-powered UiPath Documentation Assistant can provide a number of benefits to 
+users, including: 
+• Increased productivity: Users can spend less time searching for and trying to 
+understand UiPath documentation. 
+• Reduced errors: Users are less likely to make mistakes when they are using 
+the Assistant to access accurate and up-to-date documentation. 
+• Improved user experience: The Assistant will provide a more user-friendly and 
+interactive way to access UiPath documentation. 
+We believe that the AI-powered UiPath Documentation Assistant will be a valuable 
+tool for UiPath users of all levels of experience. It will help users to automate their 
+tasks more quickly and efficiently, and it will make UiPath more accessible to a wider 
+range of users. 
+How our solution addresses the hackathon theme of "AI at Work" 
+Our solution addresses the hackathon theme of "AI at Work" by enabling Generative 
+AI with LLMs to be used to improve the productivity and efficiency of UiPath users. 
+The Assistant will help users to find the information they need quickly and easily, which 
+will allow them to automate their tasks more quickly and efficiently. This can lead to 
+significant productivity gains for businesses of all sizes. 
+We believe that our solution has the potential to make a real difference in the way that 
+UiPath is used. We are excited to participate in the hackathon and to demonstrate the 
+value of our solution to the UiPath community. 
+2. Detailed description of Solution proposed 
+The proposed UiPath chatbot will be an AI-powered system that will be trained on a 
+massive dataset of UiPath documentation and forum posts. It will be able to: 
+• Answer questions about UiPath: The chatbot will be able to answer a wide 
+range of questions about UiPath, including questions about the platform, the 
+various components of the platform, and how to use the platform to automate 
+various tasks. 
+• Generate code snippets: The chatbot will be able to generate code snippets in 
+UiPath's programming language, UiPath Robot Language (UIR). This will 
+make it easier for users to automate tasks without having to write code from 
+scratch. 
+• Provide step-by-step instructions: The chatbot will be able to provide step-by- 
+step instructions on how to automate various tasks using UiPath. This will 
+make it easier for users to learn how to use UiPath, even if they have no prior 
+experience with automation. 
+The chatbot will be integrated with the UiPath platform so that users can easily 
+access it from within the UiPath environment. It will also be available as a standalone 
+application, so that users can access it from anywhere. 
+Here is a detailed description of how the chatbot will work: 
+1. The user will ask a question or give a command to the chatbot. 
+2. The chatbot will use Retravel Augmentation Generation (RAG) from Pinecone 
+vector DB to retrieve top K chunks based on cosine similarity measure 
+between the embeddings present in the DB and the user requested question. 
+3. Vector DB search result, the context and prompt engineering will be used by 
+the LLM to generate a response to the user's request. The response may be a 
+simple answer, a code snippet, or step-by-step instructions. 
+The chatbot will be trained using a variety technique, including: 
+• Reinforcement learning with human feedback (RLHF): The chatbot will be 
+trained on a simulated environment where it can interact with UiPath and 
+receive feedback on its performance. This feedback will help the chatbot to 
+learn how to generate better responses to user requests. 
+The chatbot will be deployed on a cloud platform so that it can be accessed by users 
+from anywhere. The chatbot will also be designed to be scalable so that it can 
+handle a large number of concurrent users. 
+We believe that the proposed UiPath chatbot has the potential to be a valuable tool 
+for UiPath users of all levels of experience. It will help users to automate their tasks 
+more quickly and efficiently, and it will make UiPath more accessible to a wider 
+range of users.
 #### What does it do?
 
-<!-- 2-3 paragraphs explaining your agent, the problem it solves, and why the interaction matters -->
+Our solution will be integrated with the UiPath platform, so that users can easily access 
+it from within the UiPath environment. 
+Benefits 
+An AI-powered UiPath Documentation Assistant can provide a number of benefits to 
+users, including: 
+• Increased productivity: Users can spend less time searching for and trying to 
+understand UiPath documentation. 
+• Reduced errors: Users are less likely to make mistakes when they are using 
+the Assistant to access accurate and up-to-date documentation. 
+• Improved user experience: The Assistant will provide a more user-friendly and 
+interactive way to access UiPath documentation. 
+We believe that the AI-powered UiPath Documentation Assistant will be a valuable 
+tool for UiPath users of all levels of experience. It will help users to automate their 
+tasks more quickly and efficiently, and it will make UiPath more accessible to a wider 
+range of users.
 
 #### How does the interaction work?
 
@@ -187,26 +321,40 @@ Sophiie senior engineers and CTO. Judging will take place over a 2-week period f
 
 #### What makes it special?
 
-<!-- What are you most proud of? What would you want the judges to notice? -->
+The chatbot will be integrated with the UiPath platform so that users can easily 
+access it from within the UiPath environment. It will also be available as a standalone 
+application, so that users can access it from anywhere. 
+Here is a detailed description of how the chatbot will work: 
+1. The user will ask a question or give a command to the chatbot. 
+2. The chatbot will use Retravel Augmentation Generation (RAG) from Pinecone 
+vector DB to retrieve top K chunks based on cosine similarity measure 
+between the embeddings present in the DB and the user requested question. 
+3. Vector DB search result, the context and prompt engineering will be used by 
+the LLM to generate a response to the user's request. The response may be a 
+simple answer, a code snippet, or step-by-step instructions. 
+The chatbot will be trained using a variety technique, including: 
+• Reinforcement learning with human feedback (RLHF): The chatbot will be 
+trained on a simulated environment where it can interact with UiPath and 
+receive feedback on its performance. This feedback will help the chatbot to 
+learn how to generate better responses to user requests. 
+The chatbot will be deployed on a cloud platform so that it can be accessed by users 
+from anywhere. The chatbot will also be designed to be scalable so that it can 
+handle a large number of concurrent users. 
+We believe that the proposed UiPath chatbot has the potential to be a valuable tool 
+for UiPath users of all levels of experience. It will help users to automate their tasks 
+more quickly and efficiently, and it will make UiPath more accessible to a wider 
+range of users.
 
 #### How to run it
-
-<!-- Step-by-step instructions to set up and run your project locally -->
-
-```bash
-# Example:
-# git clone <your-repo>
-# cd <your-project>
-# npm install
-# cp .env.example .env  # add your API keys
-# npm start
+Have include in repo the runbook : LLM Framework - Documentation
 ```
 
 #### Architecture / Technical Notes
 
 <!-- Optional: describe your architecture, key technical decisions, or interesting implementation details -->
 
----
+---<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/2399ea85-f201-4e09-8a34-f64a9a350344" />
+
 
 ## Code of Conduct
 
